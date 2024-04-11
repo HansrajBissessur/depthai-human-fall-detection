@@ -1,4 +1,7 @@
 opencv-python>=4.5.1.48
 depthai>=2.9
 matplotlib
-numpy
+numpy~=1.26.4
+tensorflow~=2.16.1
+scikit-learn~=1.4.2
+keras~=3.2.1
