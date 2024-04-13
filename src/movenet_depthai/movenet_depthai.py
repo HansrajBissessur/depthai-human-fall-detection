@@ -1,23 +1,3 @@
-"""
- *
- *  MoveNetDAI ===============================================================
- *
- *  > Description: Pose detection using TensorFlow's movenet model linked with
- *                 DepthAI and OpenCV for Luxonis OAK-D Pro compatitablity.
- *                 Modified version from depthai_movenet.
- *
- *  > Author: Hansraj Bissessur
- *  > Year: 2024
- *  > References:
- *      [1] https://github.com/geaxgx/depthai_movenet
- *      [2] https://doi.org/10.3390/app11010329
- *
- * ===========================================================================
- *
- * """
-
-#  ======  Dependencies  ======  #
-
 import time
 from collections import namedtuple
 from math import gcd
@@ -122,14 +102,6 @@ class MoveNetDepthAI:
         return frame, inference, crop_region
 
     def normalize(self, kps: np.ndarray) -> np.ndarray:
-        """
-         *
-         * Relative normalization algorithm. Normalizes pose to centre and removes of unnecessary head keypoints (keypoints 1 -> 4).
-         * Returns: normalized keypoints array (np.ndarray)
-         * Adapted from References[2]
-         *
-         * """
-
         data = np.copy(kps)
         if np.any(data[self.KEYPOINT_DICT['right_hip'] - 4]) and np.any(data[self.KEYPOINT_DICT['left_hip'] - 4][1]):
             data[:, 0] = data[:, 0]
@@ -137,16 +109,13 @@ class MoveNetDepthAI:
             x_centre = 0.5
             y_centre = 0.5
 
-            # hip_midpoint_y = (data[self.KEYPOINT_DICT['right_hip'] - 4 ][1] + data[self.KEYPOINT_DICT['left_hip'] - 4 ][1]) * 0.5
             hip_midpoint_x = (data[self.KEYPOINT_DICT['right_hip'] - 4][0] + data[self.KEYPOINT_DICT['left_hip'] - 4][
                 0]) * 0.5
             x_dis = hip_midpoint_x - x_centre
-            # y_dis = hip_midpoint_y - y_centre
 
             for idx, x_y in enumerate(data):
                 if x_y[0] != 0 and x_y[1] != 0:
                     data[idx][0] = x_y[0] - x_dis
-                    # data[idx][1] = x_y[1] - y_dis
             return data
         else:
             return np.zeros(data.shape)
@@ -226,8 +195,6 @@ class MoveNetDepthAI:
 
     # ---- Private Methods ---- #
     def _crop_and_resize(self, frame, crop_region) -> np.ndarray:
-        """Crops and resize the image to prepare for the model input."""
-
         cropped = frame[max(0, crop_region.ymin):min(self.img_h, crop_region.ymax),
                   max(0, crop_region.xmin):min(self.img_w, crop_region.xmax)]
         if crop_region.xmin < 0 or crop_region.xmax >= self.img_w or crop_region.ymin < 0 or crop_region.ymax >= self.img_h:
@@ -427,9 +394,9 @@ class MoveNetDepthAI:
         self.next_crop_region = self._determine_crop_region(keypoints.astype(np.int32), confidence_scores)
 
         out_keypoints = np.concatenate(
-            (keypoints[0:1], keypoints[5:17]))  # original: keypoints_norm = np.append(data[0,[1,0]] + data[5:17,[1,0]])
+            (keypoints[0:1], keypoints[5:17]))
         out_confidence_scores = np.concatenate((confidence_scores[0:1], confidence_scores[
-                                                                        5:17]))  # original: keypoints_norm = np.append(data[0,[1,0]] + data[5:17,[1,0]])
+                                                                        5:17]))
 
         for idx, score in enumerate(out_confidence_scores):
             if score < self.pose_score_threshold:
