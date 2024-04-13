@@ -20,12 +20,12 @@ class LSTMFallDetection:
     def get_model_summary(self):
         print(self.model.summary())
 
-    def fit_model(self, verbose=1, epochs=1500):
+    def fit_model(self, verbose=1, epochs=500):
         x_train, x_test, y_train, y_test = self._initialize_train_test()
         class_weights = {0: 0.3 / 0.7, 1: 0.4 / 0.7}
         self.model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=epochs, verbose=verbose,
                        class_weight=class_weights, callbacks=[self.tb_callback])
-        self.model.save('model_weights/action2.h5')
+        self.model.save('model_weights/action3.h5')
 
     def load_model_weights(self, weights):
         self.model.load_weights(weights)
